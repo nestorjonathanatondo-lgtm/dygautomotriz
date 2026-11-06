@@ -72,5 +72,61 @@ Descripción: ${NA.desc}`;window.open(`${$A}?text=${encodeURIComponent(y)}`,"_bl
 </script>
   <script>(function(){function m(a){var h=a.getAttribute("href");if(!h)return;try{var u=new URL(h,document.baseURI);if((u.protocol==="http:"||u.protocol==="https:")&&u.host!==location.host){a.target="_blank";a.rel="noopener noreferrer";}}catch(e){}}function s(){document.querySelectorAll("a[href]").forEach(m);}if(document.readyState!=="loading"){s();}else{document.addEventListener("DOMContentLoaded",s);}document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(a){m(a);}},true);})();</script>
   
+<style>
+  .dgapp-access { position: fixed; right: 18px; bottom: 18px; z-index: 100; border: 0; border-radius: 14px; padding: 12px 18px; background: #760017; color: #fff; font: 700 13px system-ui, sans-serif; box-shadow: 5px 5px 10px #c9c3be, -5px -5px 10px #fff; cursor: pointer; }
+  .dgapp-shell { min-height: 100vh; padding: 32px 20px; background: #e7e2de; color: #171717; font-family: system-ui, sans-serif; }
+  .dgapp-panel { width: min(100%, 980px); margin: 0 auto; }
+  .dgapp-back { border: 0; background: transparent; color: #760017; font-weight: 700; cursor: pointer; padding: 0; margin-bottom: 28px; }
+  .dgapp-title { font: 800 clamp(30px, 6vw, 52px) Georgia, serif; margin: 0 0 8px; }
+  .dgapp-subtitle { color: #5a5a5a; margin: 0 0 28px; }
+  .dgapp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .dgapp-card { background: #e7e2de; border-radius: 20px; padding: 22px; box-shadow: 7px 7px 14px #c9c3be, -7px -7px 14px #fff; }
+  .dgapp-card h2 { margin: 0 0 8px; font-size: 20px; }
+  .dgapp-card p { min-height: 42px; color: #5a5a5a; font-size: 13px; }
+  .dgapp-card form { display: flex; gap: 8px; flex-direction: column; }
+  .dgapp-card input { border: 0; border-radius: 10px; padding: 11px; background: #e7e2de; box-shadow: inset 4px 4px 8px #c9c3be, inset -4px -4px 8px #fff; outline: none; }
+  .dgapp-card button { border: 0; border-radius: 10px; padding: 11px; background: #760017; color: white; font-weight: 700; cursor: pointer; }
+  .dgapp-error { min-height: 18px; color: #a30022; font-size: 12px; margin: 8px 0 0; }
+  .dgapp-welcome { margin-top: 22px; padding: 18px; border-radius: 16px; background: #760017; color: white; }
+  @media (max-width: 760px) { .dgapp-grid { grid-template-columns: 1fr; } .dgapp-shell { padding: 24px 16px; } .dgapp-access { right: 14px; bottom: 14px; } }
+</style>
+<script>
+(function () {
+  var roles = [
+    { key: 'administracion', label: 'Administración', description: 'Agenda, clientes, reportes y configuración.', password: 'admin2026' },
+    { key: 'tecnico', label: 'Técnico', description: 'Órdenes de trabajo, diagnósticos y servicios.', password: 'tecnico2026' },
+    { key: 'cliente', label: 'Cliente', description: 'Citas, estado del vehículo y cotizaciones.', password: 'cliente2026' }
+  ];
+  function showAccess() { window.location.href = '/dgapp'; }
+  function addButton() {
+    if (document.querySelector('.dgapp-access')) return;
+    var button = document.createElement('button');
+    button.className = 'dgapp-access'; button.type = 'button'; button.textContent = 'Entrar a dgapp'; button.onclick = showAccess;
+    document.body.appendChild(button);
+  }
+  function renderDgapp() {
+    var root = document.getElementById('root');
+    if (!root) return;
+    document.querySelector('.dgapp-access')?.remove();
+    root.innerHTML = '';
+    var shell = document.createElement('main'); shell.className = 'dgapp-shell';
+    shell.innerHTML = '<div class="dgapp-panel"><button class="dgapp-back" type="button">← Volver a D&G Automotriz</button><h1 class="dgapp-title">dgapp</h1><p class="dgapp-subtitle">Selecciona tu área e introduce tu contraseña para continuar.</p><div class="dgapp-grid"></div><div class="dgapp-welcome" hidden></div></div>';
+    root.appendChild(shell);
+    shell.querySelector('.dgapp-back').onclick = function () { window.location.href = '/'; };
+    var grid = shell.querySelector('.dgapp-grid');
+    roles.forEach(function (role) {
+      var card = document.createElement('section'); card.className = 'dgapp-card';
+      card.innerHTML = '<h2>' + role.label + '</h2><p>' + role.description + '</p><form><label class="sr-only" for="password-' + role.key + '">Contraseña de ' + role.label + '</label><input id="password-' + role.key + '" type="password" placeholder="Contraseña" autocomplete="current-password" required><button type="submit">Acceder</button><div class="dgapp-error" aria-live="polite"></div></form>';
+      card.querySelector('form').onsubmit = function (event) {
+        event.preventDefault(); var input = card.querySelector('input'); var error = card.querySelector('.dgapp-error');
+        if (input.value === role.password) { error.textContent = ''; var welcome = shell.querySelector('.dgapp-welcome'); welcome.hidden = false; welcome.textContent = 'Acceso concedido: ' + role.label + '. El panel de trabajo estará disponible aquí.'; card.querySelector('button').textContent = 'Sesión iniciada'; input.value = ''; }
+        else { error.textContent = 'Contraseña incorrecta.'; input.value = ''; input.focus(); }
+      };
+      grid.appendChild(card);
+    });
+  }
+  if (window.location.pathname === '/dgapp') { window.setTimeout(renderDgapp, 700); } else if (document.readyState !== 'loading') addButton(); else document.addEventListener('DOMContentLoaded', addButton);
+})();
+</script>
 </body>
 </html>
